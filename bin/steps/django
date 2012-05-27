@@ -26,3 +26,10 @@ PROJECT=$(dirname $SETTINGS_FILE)
 
 echo "Copying settings_heroku.py to settings_local.py" | indent
 cp $PROJECT/settings_heroku.py $PROJECT/settings_local.py
+
+
+if [ -f bin/heroku/build_slug.sh ]
+then
+  echo "-----> Launching build_slug.sh..."
+  bin/heroku/build_slug.sh
+fi
