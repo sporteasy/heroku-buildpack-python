@@ -146,7 +146,8 @@ puts-step "Creating Virtualenv version $(virtualenv --version)"
 
 # Try to create the virtualenv.
 for dir in $VIRTUALENV_DIRS; do
-  rm -fr $dir &> /dev/null || true
+  put-steps "Removing directory ($dir)"
+  rm -rf $dir &> /dev/null || true
 done
 OUT=$(virtualenv --python $PYTHON_EXE --distribute --never-download  --prompt='(venv) ' $VIRTUALENV_LOC )
 echo "$OUT" | indent
@@ -168,7 +169,7 @@ fi
 
 # Install dependencies with Pip.
 puts-step "Installing dependencies using Pip version $(pip --version | awk '{print $2}')"
-pip install --use-mirrors -r requirements.txt --src ./.heroku/src | indent
+pip install --upgrade --use-mirrors -r requirements.txt --src ./.heroku/src | indent
 
 # Do additional application hackery if applications appears to be a Django app.
 # Optionally, disable all Django-specific changes with `DISABLE_INJECTION` env.
