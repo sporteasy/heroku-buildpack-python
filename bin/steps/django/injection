@@ -26,11 +26,18 @@ pip install --use-mirrors 'dj-database-url>=0.2.0' | indent
 SETTINGS_FILE=$(find . -maxdepth 2 -type f -name 'settings.py' | head -1)
 PROJECT=$(dirname $SETTINGS_FILE)
 
-echo "Copying settings_heroku.py to settings_local.py" | indent
-cp $PROJECT/settings_heroku.py $PROJECT/settings_local.py
+echo "Injecting code into $SETTINGS_FILE to read from DATABASE_URL" | indent
 
-if [ -f bin/heroku/build_slug.sh ]
-then
-  echo "-----> Launching build_slug.sh..."
-  bin/heroku/build_slug.sh
-fi
+cat >>$SETTINGS_FILE <<EOF
+
+import dj_database_url
+
+if 'DATABASES' not in locals():
+    DATABASES = {}
+
+if not 'default' in DATABASES:
+    DATABASES['default'] = {}
+
+DATABASES['default'].update(dj_database_url.config(default='postgres://'))
+
+EOF
